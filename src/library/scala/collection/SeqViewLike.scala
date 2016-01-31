@@ -167,9 +167,9 @@ trait SeqViewLike[+A,
   // Must also take care to allow patching inside an infinite stream
   // (patching in an infinite stream is not okay)
   trait PatchedS[B >: A] extends TransformedS[B] {
-    protected[this] val from: Int
-    protected[this] val patch: GenSeq[B]
-    protected[this] val replaced: Int
+    protected[this] lazy val from: Int
+    protected[this] lazy val patch: GenSeq[B]
+    protected[this] lazy val replaced: Int
     private lazy val plen = patch.length
     override def iterator: Iterator[B] = self.iterator patch (from, patch.iterator, replaced)
     def length: Int = {

@@ -87,15 +87,15 @@ trait IterableViewLike[+A,
   }
 
   trait ZippedI[B] extends TransformedI[(A, B)] {
-    protected[this] val other: GenIterable[B]
+    protected[this] lazy val other: GenIterable[B]
     def iterator: Iterator[(A, B)] = self.iterator zip other.iterator
     final override protected[this] def viewIdentifier = "Z"
   }
 
   trait ZippedAllI[A1 >: A, B] extends TransformedI[(A1, B)] {
-    protected[this] val other: GenIterable[B]
-    protected[this] val thisElem: A1
-    protected[this] val thatElem: B
+    protected[this] lazy val other: GenIterable[B]
+    protected[this] lazy val thisElem: A1
+    protected[this] lazy val thatElem: B
     final override protected[this] def viewIdentifier = "Z"
     def iterator: Iterator[(A1, B)] =
       self.iterator.zipAll(other.iterator, thisElem, thatElem)

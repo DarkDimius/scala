@@ -137,13 +137,13 @@ trait TraversableViewLike[+A,
    *  on it. Used for those operations which do not naturally lend themselves to a view
    */
   trait ForcedT[B] extends TransformedT[B] {
-    protected[this] val forced: GenSeq[B]
+    protected[this] lazy val forced: GenSeq[B]
     def foreach[U](f: B => U) = forced foreach f
     final override protected[this] def viewIdentifier = "C"
   }
 
   trait SlicedT extends TransformedT[A] {
-    protected[this] val endpoints: SliceInterval
+    protected[this] lazy val endpoints: SliceInterval
     protected[this] def from  = endpoints.from
     protected[this] def until = endpoints.until
     // protected def newSliced(_endpoints: SliceInterval): TransformedT[A] =
@@ -163,7 +163,7 @@ trait TraversableViewLike[+A,
   }
 
   trait MappedT[B] extends TransformedT[B] {
-    protected[this] val mapping: A => B
+    protected[this] lazy val mapping: A => B
     def foreach[U](f: B => U) {
       for (x <- self)
         f(mapping(x))
@@ -172,7 +172,7 @@ trait TraversableViewLike[+A,
   }
 
   trait FlatMappedT[B] extends TransformedT[B] {
-    protected[this] val mapping: A => GenTraversableOnce[B]
+    protected[this] lazy val mapping: A => GenTraversableOnce[B]
     def foreach[U](f: B => U) {
       for (x <- self)
         for (y <- mapping(x).seq)
@@ -182,7 +182,7 @@ trait TraversableViewLike[+A,
   }
 
   trait AppendedT[B >: A] extends TransformedT[B] {
-    protected[this] val rest: GenTraversable[B]
+    protected[this] lazy val rest: GenTraversable[B]
     def foreach[U](f: B => U) {
       self foreach f
       rest foreach f
@@ -191,7 +191,7 @@ trait TraversableViewLike[+A,
   }
   
   trait PrependedT[B >: A] extends TransformedT[B] {
-    protected[this] val fst: GenTraversable[B]
+    protected[this] lazy val fst: GenTraversable[B]
     def foreach[U](f: B => U) {
       fst foreach f
       self foreach f
@@ -200,7 +200,7 @@ trait TraversableViewLike[+A,
   }
 
   trait FilteredT extends TransformedT[A] {
-    protected[this] val pred: A => Boolean
+    protected[this] lazy val pred: A => Boolean
     def foreach[U](f: A => U) {
       for (x <- self)
         if (pred(x)) f(x)
@@ -209,7 +209,7 @@ trait TraversableViewLike[+A,
   }
 
   trait TakenWhileT extends TransformedT[A] {
-    protected[this] val pred: A => Boolean
+    protected[this] lazy val pred: A => Boolean
     def foreach[U](f: A => U) {
       for (x <- self) {
         if (!pred(x)) return
@@ -220,7 +220,7 @@ trait TraversableViewLike[+A,
   }
 
   trait DroppedWhileT extends TransformedT[A] {
-    protected[this] val pred: A => Boolean
+    protected[this] lazy val pred: A => Boolean
     def foreach[U](f: A => U) {
       var go = false
       for (x <- self) {
