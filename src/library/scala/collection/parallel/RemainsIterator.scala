@@ -474,7 +474,7 @@ self =>
     def split: Seq[IterableSplitter[S]] = self.split.map { _ map f }
   }
 
-  override def map[S](f: T => S) = new Mapped(f)
+  override def map[S](f: T => S): Mapped[S] = new Mapped(f)
 
   class Appended[U >: T, PI <: IterableSplitter[U]](protected val that: PI) extends IterableSplitter[U] {
     signalDelegate = self.signalDelegate
@@ -509,7 +509,7 @@ self =>
     }
   }
 
-  def zipParSeq[S](that: SeqSplitter[S]) = new Zipped(that)
+  def zipParSeq[S](that: SeqSplitter[S]): Zipped[S] = new Zipped(that)
 
   class ZippedAll[U >: T, S](protected val that: SeqSplitter[S], protected val thiselem: U, protected val thatelem: S)
   extends IterableSplitter[(U, S)] {
@@ -587,7 +587,7 @@ self =>
     def psplit(sizes: Int*): Seq[SeqSplitter[S]] = self.psplit(sizes: _*).map { _ map f }
   }
 
-  override def map[S](f: T => S) = new RIMapped(f)
+  override def map[S](f: T => S): RIMapped[S] = new RIMapped(f)
 
   class RIAppended[U >: T, PI <: SeqSplitter[U]](it: PI) extends super.Appended[U, PI](it) with SeqSplitter[U] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[U]]
@@ -626,7 +626,7 @@ self =>
     def psplit(szs: Int*) = (self.psplit(szs: _*) zip that.psplit(szs: _*)) map { p => p._1 zipParSeq p._2 }
   }
 
-  override def zipParSeq[S](that: SeqSplitter[S]) = new RIZipped(that)
+  override def zipParSeq[S](that: SeqSplitter[S]): RIZipped[S] = new RIZipped(that)
 
   class RIZippedAll[U >: T, S](ti: SeqSplitter[S], thise: U, thate: S) extends super.ZippedAll[U, S](ti, thise, thate) with SeqSplitter[(U, S)] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[(U, S)]]
