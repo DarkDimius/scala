@@ -136,11 +136,11 @@ trait Tasks {
  */
 trait AdaptiveWorkStealingTasks extends Tasks {
 
-  trait WrappedTask[R, Tp] extends super.WrappedTask[R, Tp] {
-    @volatile var next: WrappedTask[R, Tp] = null
+  trait AWSWrappedTask[R, Tp] extends super.WrappedTask[R, Tp] {
+    @volatile var next: AWSWrappedTask[R, Tp] = null
     @volatile var shouldWaitFor = true
 
-    def split: Seq[WrappedTask[R, Tp]]
+    def split: Seq[AWSWrappedTask[R, Tp]]
 
     def compute() = if (body.shouldSplitFurther) {
       internal()
@@ -175,8 +175,8 @@ trait AdaptiveWorkStealingTasks extends Tasks {
     }
 
     def spawnSubtasks() = {
-      var last: WrappedTask[R, Tp] = null
-      var head: WrappedTask[R, Tp] = this
+      var last: AWSWrappedTask[R, Tp] = null
+      var head: AWSWrappedTask[R, Tp] = this
       do {
         val subtasks = head.split
         head = subtasks.head
@@ -202,7 +202,7 @@ trait AdaptiveWorkStealingTasks extends Tasks {
   }
 
   // specialize ctor
-  protected def newWrappedTask[R, Tp](b: Task[R, Tp]): WrappedTask[R, Tp]
+  protected def newWrappedTask[R, Tp](b: Task[R, Tp]): AWSWrappedTask[R, Tp]
 
 }
 
@@ -212,7 +212,7 @@ trait AdaptiveWorkStealingTasks extends Tasks {
 trait ThreadPoolTasks extends Tasks {
   import java.util.concurrent._
 
-  trait WrappedTask[R, +Tp] extends Runnable with super.WrappedTask[R, Tp] {
+  trait TPWrappedTask[R, +Tp] extends Runnable with super.WrappedTask[R, Tp] {
     // initially, this is null
     // once the task is started, this future is set and used for `sync`
     // utb: var future: Future[_] = null
@@ -274,7 +274,7 @@ trait ThreadPoolTasks extends Tasks {
     }
   }
 
-  protected def newWrappedTask[R, Tp](b: Task[R, Tp]): WrappedTask[R, Tp]
+  protected def newWrappedTask[R, Tp](b: Task[R, Tp]): TPWrappedTask[R, Tp]
 
   val environment: ThreadPoolExecutor
   def executor = environment.asInstanceOf[ThreadPoolExecutor]
@@ -370,14 +370,14 @@ trait HavingForkJoinPool {
  */
 trait ForkJoinTasks extends Tasks with HavingForkJoinPool {
 
-  trait WrappedTask[R, +Tp] extends RecursiveAction with super.WrappedTask[R, Tp] {
+  trait FJWrappedTask[R, +Tp] extends RecursiveAction with super.WrappedTask[R, Tp] {
     def start() = fork
     def sync() = join
     def tryCancel = tryUnfork
   }
 
   // specialize ctor
-  protected def newWrappedTask[R, Tp](b: Task[R, Tp]): WrappedTask[R, Tp]
+  protected def newWrappedTask[R, Tp](b: Task[R, Tp]): FJWrappedTask[R, Tp]
 
   /** The fork/join pool of this collection.
    */
@@ -437,23 +437,23 @@ object ForkJoinTasks {
  */
 trait AdaptiveWorkStealingForkJoinTasks extends ForkJoinTasks with AdaptiveWorkStealingTasks {
 
-  class WrappedTask[R, Tp](val body: Task[R, Tp])
-  extends super[ForkJoinTasks].WrappedTask[R, Tp] with super[AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
+  class AWSFJWrappedTask[R, Tp](val body: Task[R, Tp])
+  extends super[ForkJoinTasks].FJWrappedTask[R, Tp] with super[AdaptiveWorkStealingTasks].AWSWrappedTask[R, Tp] {
     def split = body.split.map(b => newWrappedTask(b))
   }
 
-  def newWrappedTask[R, Tp](b: Task[R, Tp]) = new WrappedTask[R, Tp](b)
+  def newWrappedTask[R, Tp](b: Task[R, Tp]) = new AWSFJWrappedTask[R, Tp](b)
 }
 
 @deprecated("use `AdaptiveWorkStealingForkJoinTasks` instead", "2.11.0")
 trait AdaptiveWorkStealingThreadPoolTasks extends ThreadPoolTasks with AdaptiveWorkStealingTasks {
 
-  class WrappedTask[R, Tp](val body: Task[R, Tp])
-  extends super[ThreadPoolTasks].WrappedTask[R, Tp] with super[AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
+  class AWSTPWrappedTask[R, Tp](val body: Task[R, Tp])
+  extends super[ThreadPoolTasks].TPWrappedTask[R, Tp] with super[AdaptiveWorkStealingTasks].AWSWrappedTask[R, Tp] {
     def split = body.split.map(b => newWrappedTask(b))
   }
 
-  def newWrappedTask[R, Tp](b: Task[R, Tp]) = new WrappedTask[R, Tp](b)
+  def newWrappedTask[R, Tp](b: Task[R, Tp]) = new AWSTPWrappedTask[R, Tp](b)
 }
 
 /** An implementation of the `Tasks` that uses Scala `Future`s to compute

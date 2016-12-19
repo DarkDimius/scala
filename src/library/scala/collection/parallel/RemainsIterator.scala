@@ -572,24 +572,24 @@ self =>
 
   /* iterator transformers */
 
-  class Taken(tk: Int) extends super.Taken(tk) with SeqSplitter[T] {
+  class RITaken(tk: Int) extends super.Taken(tk) with SeqSplitter[T] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[T]]
     override def split: Seq[SeqSplitter[T]] = super.split.asInstanceOf[Seq[SeqSplitter[T]]]
     def psplit(sizes: Int*): Seq[SeqSplitter[T]] = takeSeq(self.psplit(sizes: _*)) { (p, n) => p.take(n) }
   }
-  override private[collection] def newTaken(until: Int): Taken = new Taken(until)
+  override private[collection] def newTaken(until: Int): RITaken = new RITaken(until)
   override def take(n: Int): SeqSplitter[T] = newTaken(n)
   override def slice(from1: Int, until1: Int): SeqSplitter[T] = newSliceInternal(newTaken(until1), from1)
 
-  class Mapped[S](f: T => S) extends super.Mapped[S](f) with SeqSplitter[S] {
+  class RIMapped[S](f: T => S) extends super.Mapped[S](f) with SeqSplitter[S] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[S]]
     override def split: Seq[SeqSplitter[S]] = super.split.asInstanceOf[Seq[SeqSplitter[S]]]
     def psplit(sizes: Int*): Seq[SeqSplitter[S]] = self.psplit(sizes: _*).map { _ map f }
   }
 
-  override def map[S](f: T => S) = new Mapped(f)
+  override def map[S](f: T => S) = new RIMapped(f)
 
-  class Appended[U >: T, PI <: SeqSplitter[U]](it: PI) extends super.Appended[U, PI](it) with SeqSplitter[U] {
+  class RIAppended[U >: T, PI <: SeqSplitter[U]](it: PI) extends super.Appended[U, PI](it) with SeqSplitter[U] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[U]]
     override def split: Seq[SeqSplitter[U]] = super.split.asInstanceOf[Seq[SeqSplitter[U]]]
     def psplit(sizes: Int*): Seq[SeqSplitter[U]] = if (firstNonEmpty) {
@@ -618,17 +618,17 @@ self =>
     } else curr.asInstanceOf[SeqSplitter[U]].psplit(sizes: _*)
   }
 
-  def appendParSeq[U >: T, PI <: SeqSplitter[U]](that: PI) = new Appended[U, PI](that)
+  def appendParSeq[U >: T, PI <: SeqSplitter[U]](that: PI) = new RIAppended[U, PI](that)
 
-  class Zipped[S](ti: SeqSplitter[S]) extends super.Zipped[S](ti) with SeqSplitter[(T, S)] {
+  class RIZipped[S](ti: SeqSplitter[S]) extends super.Zipped[S](ti) with SeqSplitter[(T, S)] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[(T, S)]]
     override def split: Seq[SeqSplitter[(T, S)]] = super.split.asInstanceOf[Seq[SeqSplitter[(T, S)]]]
     def psplit(szs: Int*) = (self.psplit(szs: _*) zip that.psplit(szs: _*)) map { p => p._1 zipParSeq p._2 }
   }
 
-  override def zipParSeq[S](that: SeqSplitter[S]) = new Zipped(that)
+  override def zipParSeq[S](that: SeqSplitter[S]) = new RIZipped(that)
 
-  class ZippedAll[U >: T, S](ti: SeqSplitter[S], thise: U, thate: S) extends super.ZippedAll[U, S](ti, thise, thate) with SeqSplitter[(U, S)] {
+  class RIZippedAll[U >: T, S](ti: SeqSplitter[S], thise: U, thate: S) extends super.ZippedAll[U, S](ti, thise, thate) with SeqSplitter[(U, S)] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[(U, S)]]
     private def patchem = {
       val selfrem = self.remaining
@@ -649,7 +649,7 @@ self =>
     }
   }
 
-  override def zipAllParSeq[S, U >: T, R >: S](that: SeqSplitter[S], thisElem: U, thatElem: R) = new ZippedAll[U, R](that, thisElem, thatElem)
+  override def zipAllParSeq[S, U >: T, R >: S](that: SeqSplitter[S], thisElem: U, thatElem: R) = new RIZippedAll[U, R](that, thisElem, thatElem)
 
   def reverse: SeqSplitter[T] = {
     val pa = mutable.ParArray.fromTraversables(self).reverse
