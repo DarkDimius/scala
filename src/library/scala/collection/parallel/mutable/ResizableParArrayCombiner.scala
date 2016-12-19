@@ -80,7 +80,9 @@ trait ResizableParArrayCombiner[T] extends LazyCombiner[T, ParArray[T], ExposedA
 
 object ResizableParArrayCombiner {
   def apply[T](c: ArrayBuffer[ExposedArrayBuffer[T]]): ResizableParArrayCombiner[T] = {
-    new { val chain = c } with ResizableParArrayCombiner[T] // was: with EnvironmentPassingCombiner[T, ParArray[T]]
+    new ResizableParArrayCombiner[T] { // was: with EnvironmentPassingCombiner[T, ParArray[T]]
+      lazy val chain = c
+    }
   }
   def apply[T](): ResizableParArrayCombiner[T] = apply(new ArrayBuffer[ExposedArrayBuffer[T]] += new ExposedArrayBuffer[T])
 }
