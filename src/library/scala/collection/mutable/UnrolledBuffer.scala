@@ -70,13 +70,13 @@ extends scala.collection.mutable.AbstractBuffer[T]
   // The below would allow more flexible behavior without requiring inheritance
   // that is risky because all the important internals are private.
   // private var myLengthPolicy: Int => Int = x => x
-  // 
+  //
   // /** Specifies how the array lengths should vary.
-  //   * 
+  //   *
   //   *  By default,  `UnrolledBuffer` uses arrays of a fixed size.  A length
   //   *  policy can be given that changes this scheme to, for instance, an
   //   *  exponential growth.
-  //   * 
+  //   *
   //   *  @param nextLength   computes the length of the next array from the length of the latest one
   //   */
   // def setLengthPolicy(nextLength: Int => Int): Unit = { myLengthPolicy = nextLength }
@@ -345,7 +345,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
       tryMergeWithNext()
     }
 
-    override def toString = array.take(size).mkString("Unrolled@%08x".format(System.identityHashCode(this)) + "[" + size + "/" + array.length + "](", ", ", ")") + " -> " + (if (next ne null) next.toString else "")
+    override def toString: String = array.take(size).mkString("Unrolled@%08x".format(System.identityHashCode(this)) + "[" + size + "/" + array.length + "](", ", ", ")") + " -> " + (if (next ne null) next.toString else "")
   }
 
 }

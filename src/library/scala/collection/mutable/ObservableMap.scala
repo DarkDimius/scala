@@ -37,12 +37,12 @@ trait ObservableMap[A, B] extends Map[A, B] with Publisher[Message[(A, B)] with 
       case None =>
         super.+=(kv)
         publish(new Include((key, value)) with Undoable {
-          def undo = -=(key)
+          def undo() = -=(key)
         })
       case Some(old) =>
         super.+=(kv)
         publish(new Update((key, value)) with Undoable {
-          def undo = +=((key, old))
+          def undo() = +=((key, old))
         })
     }
     this

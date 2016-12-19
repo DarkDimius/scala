@@ -31,7 +31,7 @@ trait ObservableSet[A] extends Set[A] with Publisher[Message[A] with Undoable] {
   abstract override def +=(elem: A): this.type = {
     if (!contains(elem)) {
       super.+=(elem)
-      publish(new Include(elem) with Undoable { def undo = -=(elem) })
+      publish(new Include(elem) with Undoable { def undo() = -=(elem) })
     }
     this
   }
@@ -39,7 +39,7 @@ trait ObservableSet[A] extends Set[A] with Publisher[Message[A] with Undoable] {
   abstract override def -=(elem: A): this.type = {
     if (contains(elem)) {
       super.-=(elem)
-      publish(new Remove(elem) with Undoable { def undo = +=(elem) })
+      publish(new Remove(elem) with Undoable { def undo() = +=(elem) })
     }
     this
   }
