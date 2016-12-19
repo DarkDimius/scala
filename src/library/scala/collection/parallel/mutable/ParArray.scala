@@ -582,7 +582,7 @@ self =>
     val targetarr = targarrseq.array.asInstanceOf[Array[Any]]
 
     // fill it in parallel
-    tasksupport.executeAndWaitResult(new Map[S](f, targetarr, 0, length))
+    tasksupport.executeAndWaitResult(new PAMap[S](f, targetarr, 0, length))
 
     // wrap it into a parallel array
     (new ParArray[S](targarrseq)).asInstanceOf[That]
@@ -644,7 +644,7 @@ self =>
     }
   }
 
-  class Map[S](f: T => S, targetarr: Array[Any], offset: Int, howmany: Int) extends Task[Unit, Map[S]] {
+  class PAMap[S](f: T => S, targetarr: Array[Any], offset: Int, howmany: Int) extends Task[Unit, PAMap[S]] {
     var result = ()
 
     def leaf(prev: Option[Unit]) = {
@@ -659,7 +659,7 @@ self =>
     }
     def split = {
       val fp = howmany / 2
-      List(new Map(f, targetarr, offset, fp), new Map(f, targetarr, offset + fp, howmany - fp))
+      List(new PAMap(f, targetarr, offset, fp), new PAMap(f, targetarr, offset + fp, howmany - fp))
     }
     def shouldSplitFurther = howmany > scala.collection.parallel.thresholdFromSize(length, tasksupport.parallelismLevel)
   }
