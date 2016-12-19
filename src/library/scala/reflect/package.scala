@@ -60,7 +60,7 @@ package object reflect {
   // implementation is hardwired into `scala.reflect.reify.Taggers`
   // using the mechanism implemented in `scala.tools.reflect.FastTrack`
   // todo. once we have implicit macros for tag generation, we can remove this anchor
-  private[scala] def materializeClassTag[T](): ClassTag[T] = macro ???
+  private[scala] def materializeClassTag[T](): ClassTag[T] = /*macro*/ ???
 }
 
 /** An exception that indicates an error during Scala reflection */
