@@ -166,7 +166,7 @@ private[scala] trait PropertiesTrait {
   def jdkHome               = envOrElse("JDK_HOME", envOrElse("JAVA_HOME", javaHome))
 
   // private[scala] for 2.12
-  private[this] def versionFor(command: String) = f"Scala $command $versionString -- $copyrightString"
+  private[this] def versionFor(command: String) = s"Scala $command $versionString -- $copyrightString"
 
   def versionMsg            = versionFor(propCategory)
   def scalaCmd              = if (isWin) "scala.bat" else "scala"
