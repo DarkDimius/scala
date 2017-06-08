@@ -434,7 +434,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable with Ordered[
    *  with large exponents.
    */
   override def hashCode(): Int = {
-    if (computedHashCode == BigDecimal.hashCodeNotComputed) computeHashCode
+    if (computedHashCode == BigDecimal.hashCodeNotComputed) computeHashCode()
     computedHashCode
   }
 
@@ -524,7 +524,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable with Ordered[
     catch { case _: ArithmeticException => false }
   }
 
-  def isWhole() = scale <= 0 || bigDecimal.stripTrailingZeros.scale <= 0
+  def isWhole = scale <= 0 || bigDecimal.stripTrailingZeros.scale <= 0
 
   def underlying = bigDecimal
 
@@ -755,20 +755,20 @@ extends ScalaNumber with ScalaNumericConversions with Serializable with Ordered[
 
   /** Converts this `BigDecimal` to a scala.BigInt.
    */
-  def toBigInt(): BigInt = new BigInt(this.bigDecimal.toBigInteger())
+  def toBigInt: BigInt = new BigInt(this.bigDecimal.toBigInteger)
 
   /** Converts this `BigDecimal` to a scala.BigInt if it
    *  can be done losslessly, returning Some(BigInt) or None.
    */
-  def toBigIntExact(): Option[BigInt] =
-    if (isWhole()) {
-      try Some(new BigInt(this.bigDecimal.toBigIntegerExact()))
+  def toBigIntExact: Option[BigInt] =
+    if (isWhole) {
+      try Some(new BigInt(this.bigDecimal.toBigIntegerExact))
       catch { case _: ArithmeticException => None }
     }
     else None
 
   /** Returns the decimal String representation of this BigDecimal.
    */
-  override def toString(): String = this.bigDecimal.toString()
+  override def toString: String = this.bigDecimal.toString()
 
 }

@@ -42,7 +42,7 @@ trait ScalaNumberProxy[T] extends Any with ScalaNumericAnyConversions with Typed
   def signum          = num.signum(self)
 }
 trait ScalaWholeNumberProxy[T] extends Any with ScalaNumberProxy[T] {
-  def isWhole() = true
+  def isWhole = true
 }
 trait IntegralProxy[T] extends Any with ScalaWholeNumberProxy[T] with RangedProxy[T] {
   protected implicit def num: Integral[T]
@@ -63,7 +63,7 @@ trait FractionalProxy[T] extends Any with ScalaNumberProxy[T] with RangedProxy[T
    */
   type ResultWithoutStep = Range.Partial[T, NumericRange[T]]
 
-  def isWhole() = false
+  def isWhole = false
   def until(end: T): ResultWithoutStep                  = new Range.Partial(NumericRange(self, end, _))
   def until(end: T, step: T): NumericRange.Exclusive[T] = NumericRange(self, end, step)
   def to(end: T): ResultWithoutStep                     = new Range.Partial(NumericRange.inclusive(self, end, _))
