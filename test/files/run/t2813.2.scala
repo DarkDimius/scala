@@ -32,8 +32,8 @@ object Test extends App {
     assertListEquals((List(10, 11)), l)
   }
 
-  addAllOfNonCollectionWrapperAtZeroOnEmptyLinkedList
-  addAllOfNonCollectionWrapperAtZeroOnLinkedList
-  addAllOfCollectionWrapperAtZeroOnEmptyLinkedList
-  addAllOfCollectionWrapperAtZeroOnLinkedList
+  addAllOfNonCollectionWrapperAtZeroOnEmptyLinkedList()
+  addAllOfNonCollectionWrapperAtZeroOnLinkedList()
+  addAllOfCollectionWrapperAtZeroOnEmptyLinkedList()
+  addAllOfCollectionWrapperAtZeroOnLinkedList()
 }
