@@ -147,7 +147,7 @@ extends scala.collection.AbstractSeq[Int]
     else start + (step * idx)
   }
 
-  @inline final override def foreach[@specialized(Unit) U](f: Int => U) {
+  final override def foreach[@specialized(Unit) U](f: Int => U) {
     // Implementation chosen on the basis of favorable microbenchmarks
     // Note--initialization catches step == 0 so we don't need to here
     if (!isEmpty) {
