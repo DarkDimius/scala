@@ -55,7 +55,7 @@ trait Growable[-A] extends Clearable {
       }
     }
     xs match {
-      case xs: scala.collection.LinearSeq[_] => loop(xs)
+      case xs: scala.collection.LinearSeq[A] => loop(xs)
       case xs                                => xs foreach +=
     }
     this
